@@ -1,42 +1,35 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import { invoke } from "@tauri-apps/api/core";
 
-const greetMsg = ref("");
-const name = ref("");
+type PortInfo = { port: number; pid: number; process: string };
 
-async function greet() {
+const inUsePorts = ref<PortInfo[]>([]);
+
+async function getInUse() {
   // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-  greetMsg.value = await invoke("greet", { name: name.value });
+  inUsePorts.value = await invoke("get_ports");
 }
+
+onMounted(() => {
+   getInUse();
+
+   setInterval(() => {
+    getInUse(); 
+   }, 5000);
+});
 </script>
 
 <template>
   <main class="container">
-    <h1>Welcome to Tauri + Vue</h1>
-
-    <div class="row">
-      <a href="https://vite.dev" target="_blank">
-        <img src="/vite.svg" class="logo vite" alt="Vite logo" />
-      </a>
-      <a href="https://tauri.app" target="_blank">
-        <img src="/tauri.svg" class="logo tauri" alt="Tauri logo" />
-      </a>
-      <a href="https://vuejs.org/" target="_blank">
-        <img src="./assets/vue.svg" class="logo vue" alt="Vue logo" />
-      </a>
-    </div>
-    <p>Click on the Tauri, Vite, and Vue logos to learn more.</p>
-
-    <form class="row" @submit.prevent="greet">
-      <input id="greet-input" v-model="name" placeholder="Enter a name..." />
-      <button type="submit">Greet</button>
-    </form>
-    <p>{{ greetMsg }}</p>
+    <h1>In Use Ports</h1>
+    <div v-for="p in inUsePorts" :key="p.port">
+      <p>Port {{ p.port }} is used by {{ p.process }} (PID {{ p.pid }}).</p>
+    </div>  
   </main>
 </template>
 
-<style scoped>
+<style lang="scss">
 .logo.vite:hover {
   filter: drop-shadow(0 0 2em #747bff);
 }
