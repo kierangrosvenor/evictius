@@ -19,13 +19,17 @@ jobs:
           node-version: lts/*
           cache: npm
 
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
       - uses: dtolnay/rust-toolchain@stable
 
       - uses: swatinem/rust-cache@v2
         with:
           workspaces: "./src-tauri -> target"
 
-      - run: npm ci
+      - run: bun install
 
       - uses: tauri-apps/tauri-action@v0
         env:
