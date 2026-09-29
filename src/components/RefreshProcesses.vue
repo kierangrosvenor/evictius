@@ -1,10 +1,12 @@
 <script setup lang="ts">
+import EvSelect from './EvSelect.vue';
+
 const emit = defineEmits<{
   refreshNow: [];
   setRefreshInterval: [interval: number];
 }>();
 
-defineProps<{
+const props = defineProps<{
   interval: number;
 }>();
 
@@ -21,19 +23,16 @@ function refreshNow() {
   emit("refreshNow");
 }
 
-function onIntervalChange(event: Event) {
-  const value = Number((event.target as HTMLSelectElement).value);
-  emit("setRefreshInterval", value);
+function onIntervalChange(value: string | number) {
+  emit("setRefreshInterval", Number(value));
 }
 </script>
 
 <template>
     <div class="refresh-settings">
-      <select :value="interval" @change="onIntervalChange">
-        <option v-for="o in options" :key="o.value" :value="o.value">
-          {{ o.label }}
-        </option>
-      </select>
+
+      <EvSelect :options="options" :modelValue="props.interval" @update:modelValue="onIntervalChange" /> 
+      
 
        <button @click="refreshNow">Refresh now</button>
     </div>

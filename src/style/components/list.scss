@@ -5,7 +5,7 @@
         justify-content: space-between;
         color: var(--text-color);
         background-color: var(--list-item-background-color);
-        border-top: 1px solid var(--list-item-border-color);
+        border-bottom: 1px solid var(--list-item-border-color);
 
         > div {
             box-sizing: border-box;

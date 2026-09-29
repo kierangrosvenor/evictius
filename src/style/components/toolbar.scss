@@ -3,6 +3,10 @@
     display: flex;
     flex-direction: row;
     gap: 8px;
+    position: sticky;
+    top: 0;
+    border-bottom: 1px solid var(--list-item-border-color);
+    background: var(--toolbar-background-color);
 
     input {
         flex: 1;
