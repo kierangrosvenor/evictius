@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, watch, computed } from "vue"
 import { invoke } from "@tauri-apps/api/core";
+import { listen, type UnlistenFn } from "@tauri-apps/api/event";
 import ProcessListItem from "./components/ProcessListItem.vue";
 import RefreshProcesses from "./components/RefreshProcesses.vue";
 
@@ -8,13 +9,14 @@ type PortInfo = { port: number; pid: number; process: string; command: string; s
 
 const isDark = ref(false);
 let mediaQuery = null as unknown as MediaQueryList;
-
+let processChangedUnlistener: UnlistenFn | undefined;
 const searchValue = ref<string>("");
 const inUsePorts = ref<PortInfo[]>([]);
 const refreshInterval = ref<number>(3000);
 
 const sortKey = ref<keyof PortInfo | null>();
 const sortDirection = ref<string>("asc");
+  
 
 const updateTheme = (e: MediaQueryListEvent) => {
   const savedTheme = localStorage.getItem('theme')
@@ -35,6 +37,7 @@ async function getInUse() {
   inUsePorts.value = await invoke("get_processes")
 }
 
+
 const setRefreshInterval = (interval: number) => {
   refreshInterval.value = interval;
 };
@@ -48,10 +51,16 @@ function startTimer() {
 
 watch(refreshInterval, startTimer);
 
-onMounted(() => {
+onMounted(async () => {
   mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
   getInUse();
   startTimer();
+
+  processChangedUnlistener = await listen("processes_changed", () => {
+    alert('Fetching...')
+    getInUse();
+  });
+
   mediaQuery.addEventListener('change', updateTheme)
 });
 
@@ -82,8 +91,12 @@ function setSort(keyName: keyof PortInfo) {
 }
 
 onUnmounted(() => {
-  clearInterval(timer);
-  mediaQuery.removeEventListener('change', updateTheme);
+  clearInterval(timer); 
+  processChangedUnlistener?.();
+  if(mediaQuery) {
+      mediaQuery.removeEventListener('change', updateTheme);
+  }
+
 });
 </script>
 

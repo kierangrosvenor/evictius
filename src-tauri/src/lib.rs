@@ -1,9 +1,12 @@
 mod process;
 
 
+
+use tauri::{AppHandle, Emitter};
+
 #[tauri::command]
-async fn kill_process(pid: u32) -> Result<String, String> {
-    process::kill_process(pid)
+async fn kill_process(app:AppHandle, pid: u32) -> Result<String, String> {
+    process::kill_process(app, pid)
 }
 
 #[tauri::command]

@@ -4,6 +4,7 @@ use windows_sys::Win32::Foundation::CloseHandle;
 use windows_sys::Win32::System::Threading::{OpenProcess, PROCESS_TERMINATE};
 
 use super::PortInfo;
+use tauri::{AppHandle, Emitter};
 
 
 const DYNAMIC_PORT_START: u16 = 49152; // Windows hands out ports from this number up to its own services.
@@ -29,7 +30,7 @@ fn can_terminate(pid: u32) -> bool {
     }
 }
 
-pub fn kill_process(pid: u32) -> Result<String, String> {
+pub fn kill_process(app: AppHandle, pid: u32) -> Result<String, String> {
     let pid = Pid::from_u32(pid);
 
     // Only look up the one process we want, not every process on the machine.
@@ -43,6 +44,8 @@ pub fn kill_process(pid: u32) -> Result<String, String> {
     if !process.kill() {
         return Err(format!("Failed to kill process with PID: {} (it may need admin rights)", pid));
     }
+
+    app.emit("refresh_processes", ()).map_err(|e| e.to_string())?;
 
     Ok(format!("Successfully killed process with PID: {}", pid))
 }
