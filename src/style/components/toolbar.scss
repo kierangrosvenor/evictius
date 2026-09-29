@@ -1,0 +1,11 @@
+.toolbar {
+    padding: 8px;
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+
+    input {
+        flex: 1;
+        min-width: 0;
+    }
+}

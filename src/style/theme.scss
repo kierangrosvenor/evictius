@@ -1,0 +1,26 @@
+// Add a color to both maps and it becomes var(--name) everywhere.
+$light: (
+  text-color: black,
+  background-color: white,
+  brand-color: #eff5fc,
+  input-background-color: #fff,
+  input-border-color: #ccc,
+  list-item-background-color: #f8f9fa,
+  list-item-border-color: #dee2e6,
+);
+
+$dark: (
+  text-color: white,
+  background-color: rgb(43, 42, 42),
+  brand-color: #242527,
+  input-background-color: #333,
+  input-border-color: #555,
+  list-item-background-color: #2c2c2c,
+  list-item-border-color: #444,
+);
+
+@mixin vars($theme) {
+  @each $name, $value in $theme {
+    --#{$name}: #{$value};
+  }
+}

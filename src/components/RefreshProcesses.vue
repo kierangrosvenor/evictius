@@ -28,14 +28,19 @@ function onIntervalChange(event: Event) {
 </script>
 
 <template>
-    <div class="row">
-      How often to check ports?
+    <div class="refresh-settings">
       <select :value="interval" @change="onIntervalChange">
         <option v-for="o in options" :key="o.value" :value="o.value">
           {{ o.label }}
         </option>
       </select>
-    </div>
 
-    <button @click="refreshNow">Refresh now</button>
+       <button @click="refreshNow">Refresh now</button>
+    </div>
 </template>
+<style>
+.refresh-settings {
+  display: flex;
+  gap: 8px;
+}
+</style>

@@ -1,0 +1,16 @@
+@use "theme";
+
+@use "./components/toolbar.scss";
+@use "./components/input.scss";
+@use "./components/list.scss";
+@use "./components/button.scss";
+@use "./components/body.scss";
+
+
+:root {
+  @include theme.vars(theme.$light);
+}
+
+.dark {
+  @include theme.vars(theme.$dark);
+}

@@ -1,0 +1,98 @@
+.list {
+    .list-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        color: var(--text-color);
+        background-color: var(--list-item-background-color);
+        border-top: 1px solid var(--list-item-border-color);
+
+        > div {
+            box-sizing: border-box;
+            padding: 8px 12px;
+            white-space: nowrap;
+        }
+
+        > div:nth-child(1) {
+            flex: 1;
+            min-width: 0;
+        }
+
+        > div:nth-child(2),
+        > div:nth-child(3) {
+            flex: 0 0 5.5rem;
+        }
+
+        > .action {
+            flex: 0 0 9rem;
+            text-align: right;
+        }
+
+        .process-cell {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .process-text {
+            min-width: 0;
+        }
+
+        .icon {
+            flex: 0 0 20px;
+            height: 20px;
+
+            svg {
+                display: block;
+                width: 100%;
+                height: 100%;
+                fill: currentColor;
+            }
+        }
+
+        .name,
+        .command {
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .command {
+            font-size: 0.85em;
+            opacity: 0.6;
+        }
+    }
+
+    .list-header {
+        font-weight: bold;
+
+        .sortable {
+            cursor: pointer;
+            user-select: none;
+
+            &::after {
+                content: "";
+                display: inline-block;
+                margin-left: 0.4em;
+                vertical-align: middle;
+                border-left: 4px solid transparent;
+                border-right: 4px solid transparent;
+                border-bottom: 5px solid currentColor;
+                opacity: 0;
+            }
+
+            &:hover::after {
+                opacity: 0.3;
+            }
+
+            &.asc::after {
+                opacity: 1;
+            }
+
+            &.desc::after {
+                opacity: 1;
+                border-bottom: none;
+                border-top: 5px solid currentColor;
+            }
+        }
+    }
+}

@@ -1,18 +1,39 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, watch } from "vue";
+import { ref, onMounted, onUnmounted, watch, computed } from "vue"
 import { invoke } from "@tauri-apps/api/core";
-import PortRowItem from "./components/PortRowItem.vue";
-import RefreshSettings from "./components/RefreshSettings.vue";
+import ProcessListItem from "./components/ProcessListItem.vue";
+import RefreshProcesses from "./components/RefreshProcesses.vue";
 
-type PortInfo = { port: number; pid: number; process: string };
+type PortInfo = { port: number; pid: number; process: string; command: string; shortCommand: string };
 
+const isDark = ref(false);
+let mediaQuery = null as unknown as MediaQueryList;
+
+const searchValue = ref<string>("");
 const inUsePorts = ref<PortInfo[]>([]);
+const refreshInterval = ref<number>(3000);
 
-async function getInUse() {
-  inUsePorts.value = await invoke("get_ports");
+const sortKey = ref<keyof PortInfo | null>();
+const sortDirection = ref<string>("asc");
+
+const updateTheme = (e: MediaQueryListEvent) => {
+  const savedTheme = localStorage.getItem('theme')
+  if (savedTheme) {
+    isDark.value = savedTheme === 'dark'
+  } else {
+    isDark.value = e ? e.matches : mediaQuery.matches
+  }
+
+  if (isDark.value) {
+    document.documentElement.classList.add('dark')
+  } else {
+    document.documentElement.classList.remove('dark')
+  }
 }
 
-const refreshInterval = ref<number>(3000);
+async function getInUse() {
+  inUsePorts.value = await invoke("get_processes")
+}
 
 const setRefreshInterval = (interval: number) => {
   refreshInterval.value = interval;
@@ -28,26 +49,61 @@ function startTimer() {
 watch(refreshInterval, startTimer);
 
 onMounted(() => {
+  mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
   getInUse();
   startTimer();
+  mediaQuery.addEventListener('change', updateTheme)
 });
 
-onUnmounted(() => clearInterval(timer));
+const filteredPorts = computed(() => {
+  const search = searchValue.value.toLowerCase();
+  const list = inUsePorts.value.filter((p) => p.process.toLowerCase().includes(search));
+
+  const key = sortKey.value;
+  if (!key) return list;
+
+  const dir = sortDirection.value === "asc" ? 1 : -1;
+  return list.sort((a, b) => {
+    const result = key === "process"
+      ? a.process.localeCompare(b.process)
+      : Number(a[key]) - Number(b[key]); 
+    return result * dir;
+  });
+});
+
+// "asc" or "desc" on the column being sorted, nothing on the rest.
+function sortClass(keyName: string) {
+  return sortKey.value === keyName ? sortDirection.value : "";
+}
+
+function setSort(keyName: keyof PortInfo) {
+  sortKey.value = keyName;
+  sortDirection.value = sortDirection.value === "asc" ? "desc" : "asc";
+}
+
+onUnmounted(() => {
+  clearInterval(timer);
+  mediaQuery.removeEventListener('change', updateTheme);
+});
 </script>
 
 <template>
-  <main class="container">
-    <h1>In Use Ports</h1>
-    <RefreshSettings
-     @refreshNow="getInUse" 
-     @setRefreshInterval="setRefreshInterval"
-     :interval="refreshInterval"/>
-    <PortRowItem 
-      v-for="p in inUsePorts" 
-      :key="p.port" 
-      :port="p.port" 
-      :process="p.process" 
-      :pid="p.pid"
-      />
+  <main class="container" :class="{ dark: isDark }">
+    <section class="toolbar">
+      <input type="text" v-model="searchValue" placeholder="Search by process name" />
+      <RefreshProcesses @refreshNow="getInUse" @setRefreshInterval="setRefreshInterval" :interval="refreshInterval" />
+    </section>
+    <div class="list">
+      <div class="list-item list-header">
+        <div class="sortable" :class="sortClass('process')" @click="setSort('process')">Process</div>
+        <div class="sortable" :class="sortClass('port')" @click="setSort('port')">Port</div>
+        <div class="sortable" :class="sortClass('pid')" @click="setSort('pid')">PID</div>
+        <div class="action"></div>
+      </div>
+      <ProcessListItem v-for="p in filteredPorts" :key="p.port" :port="p.port" :process="p.process" :pid="p.pid" :command="p.command" :short-command="p.shortCommand" />
+    </div>
   </main>
 </template>
+<style lang="scss">
+@use "./style/common.scss";
+</style>
