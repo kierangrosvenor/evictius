@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="400" viewBox="0 0 1280 400">
+  <style>
+    text { font-family: ui-monospace, "Cascadia Mono", Consolas, Menlo, monospace; fill: #d4d4d4; }
+    .dim { fill: #6b6b6b; }
+    .red { fill: #ff5f57; }
+    .big { font-size: 72px; font-weight: 700; fill: #ffffff; }
+  </style>
+  <rect width="1280" height="400" fill="#161616"/>
+
+  <text x="72" y="130" class="big">evictius</text>
+  <text x="76" y="176" font-size="22" class="dim">kill whatever is hogging your dev ports.</text>
+
+  <g font-size="22" xml:space="preserve">
+    <text y="250" class="dim"><tspan x="76">PORT</tspan><tspan x="196">PROCESS</tspan><tspan x="356">PID</tspan></text>
+    <text y="290"><tspan x="76">5173</tspan><tspan x="196">vite</tspan><tspan x="356">18244</tspan><tspan x="476" class="red">killed</tspan></text>
+    <text y="326"><tspan x="76">4321</tspan><tspan x="196">astro</tspan><tspan x="356">9120</tspan></text>
+  </g>
+</svg>
