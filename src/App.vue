@@ -57,7 +57,6 @@ onMounted(async () => {
   startTimer();
 
   processChangedUnlistener = await listen("processes_changed", () => {
-    alert('Fetching...')
     getInUse();
   });
 
