@@ -15,6 +15,7 @@ const SYSTEM_PROCESSES: &[&str] = &[ // Ports and services we don't care about, 
     "wininit.exe",
     "services.exe",
     "spoolsv.exe",
+    "code.exe",
 ];
 
 // Asks Windows if we're allowed to kill this process, without killing it.
@@ -45,7 +46,7 @@ pub fn kill_process(app: AppHandle, pid: u32) -> Result<String, String> {
         return Err(format!("Failed to kill process with PID: {} (it may need admin rights)", pid));
     }
 
-    app.emit("refresh_processes", ()).map_err(|e| e.to_string())?;
+    app.emit("processes_changed", ()).map_err(|e| e.to_string())?;
 
     Ok(format!("Successfully killed process with PID: {}", pid))
 }
