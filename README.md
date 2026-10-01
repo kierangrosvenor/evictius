@@ -7,6 +7,18 @@
 
 Create a utility which can kill your development ports from one simple interface. 💀
 
+## Complete
+
+* Windows
+* Tauri hooks to front end
+* Vue 3 app and styling
+
+
+## Todo
+Looking for help on the following platforms:
+
+* mac
+* linux
 
 
 ## Built with
